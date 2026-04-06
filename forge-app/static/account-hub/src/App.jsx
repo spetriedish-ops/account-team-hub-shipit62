@@ -94,7 +94,8 @@ function App() {
           openTasks: tasks.filter((t) => t.status !== 'Done').length,
           unclaimedTasks: grayArea.length,
           meetings: meetings.length,
-          supportTickets: Math.floor(Math.random() * 5) + 1, // Mock data
+          // Mock support ticket count — in production, query JSM API for open P1/P2 tickets
+          supportTickets: tasks.filter((t) => t.labels && t.labels.includes('support')).length || 2,
         });
 
         setActivity(activity);

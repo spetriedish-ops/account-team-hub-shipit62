@@ -112,11 +112,15 @@ function App() {
       });
     }
 
-    // Filter for my accounts (would filter by CSM or account owner)
-    // In production, get current user and filter by CSM field
+    // Filter for my accounts by CSM name
+    // In production, replace 'currentUser' with the result of getContext() to get the logged-in user
     if (myAccounts) {
-      // filtered = filtered.filter(account => account.csm === currentUser);
-      // For now, just keep all accounts
+      filtered = filtered.filter((account) => {
+        // Match against the CSM field on the account — in production this would use
+        // the current user's Atlassian account ID or email from @forge/bridge getContext()
+        const currentUser = 'Sarah Johnson'; // TODO: replace with getContext() call
+        return account.csm === currentUser;
+      });
     }
 
     setFilteredAccounts(filtered);

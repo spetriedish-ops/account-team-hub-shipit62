@@ -8,60 +8,72 @@ app:
 
 modules:
   # Confluence macro modules - Custom UI dashboard components
-  - key: account-hub-macro
-    location: confluence:macro
-    title: Account Hub Dashboard
-    description: Main account team hub dashboard showing metrics, activities, and team info
-    resource: static/account-hub
-    properties:
-      accountId:
-        required: true
-        type: string
-        description: The account ID to display in this hub
-  
-  - key: gray-area-queue-macro
-    location: confluence:macro
-    title: Gray Area Queue
-    description: Displays unclaimed tasks requiring immediate attention
-    resource: static/account-hub
-    properties:
-      maxItems:
-        type: string
-        description: Maximum number of items to display
+  confluence:macro:
+    - key: account-hub-macro
+      title: Account Hub Dashboard
+      description: Main account team hub dashboard showing metrics, activities, and team info
+      resource: account-hub-resource
+      render: native
+      properties:
+        accountId:
+          required: true
+          type: string
+          description: The account ID to display in this hub
 
-  - key: focus-areas-macro
-    location: confluence:macro
-    title: Focus Areas
-    description: Inline-editable focus areas stored in page properties
-    resource: static/account-hub
-    properties:
-      focusAreaIds:
-        type: string
-        description: Comma-separated list of focus area IDs
+    - key: gray-area-queue-macro
+      title: Gray Area Queue
+      description: Displays unclaimed tasks requiring immediate attention
+      resource: account-hub-resource
+      render: native
+      properties:
+        maxItems:
+          type: string
+          description: Maximum number of items to display
+
+    - key: focus-areas-macro
+      title: Focus Areas
+      description: Inline-editable focus areas stored in page properties
+      resource: account-hub-resource
+      render: native
+      properties:
+        focusAreaIds:
+          type: string
+          description: Comma-separated list of focus area IDs
 
   # Jira global page module for cross-account dashboard
-  - key: portfolio-view
-    location: jira:globalPage
-    title: Account Portfolio View
-    description: Cross-account triage dashboard showing all account health and status
-    resource: static/portfolio-view
+  jira:globalPage:
+    - key: portfolio-view
+      title: Account Portfolio View
+      description: Cross-account triage dashboard showing all account health and status
+      resource: portfolio-view-resource
 
   # Web triggers for external integrations
-  - key: google-calendar-sync
-    location: webtrigger
-    description: Receives Google Calendar push notifications and syncs to Confluence
-    endpoint: src/webtriggers/googleCalendarSync.js
+  webtrigger:
+    - key: google-calendar-sync
+      handler: googleCalendarSyncHandler
+      description: Receives Google Calendar push notifications and syncs to Confluence
 
-  - key: slack-pin-listener
-    location: webtrigger
-    description: Receives Slack pin events and stores them in Forge Storage
-    endpoint: src/webtriggers/slackPinListener.js
+    - key: slack-pin-listener
+      handler: slackPinListenerHandler
+      description: Receives Slack pin events and stores them in Forge Storage
 
-  # GraphQL resolvers for data fetching
-  - key: resolvers
-    location: backend
-    resolver:
-      entry_point: src/resolvers/index.js
+  # Backend function for resolvers and webtrigger handlers
+  function:
+    - key: resolverHandler
+      handler: src/resolvers/index.handler
+
+    - key: googleCalendarSyncHandler
+      handler: src/webtriggers/googleCalendarSync.handler
+
+    - key: slackPinListenerHandler
+      handler: src/webtriggers/slackPinListener.handler
+
+resources:
+  - key: account-hub-resource
+    path: static/account-hub
+
+  - key: portfolio-view-resource
+    path: static/portfolio-view
 
 permissions:
   content:
