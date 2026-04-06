@@ -1,0 +1,106 @@
+/**
+ * Team Roster Styles
+ */
+
+.roster-section {
+  min-height: 250px;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.roster-card {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roster-card:hover {
+  border-color: #0052cc;
+  box-shadow: 0 2px 8px rgba(0, 82, 204, 0.1);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0052cc, #0747a6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.member-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.member-role {
+  font-size: 11px;
+  color: #0052cc;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.member-owns {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+}
+
+.member-email {
+  font-size: 11px;
+  color: #0052cc;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-email:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .roster-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .roster-card {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .member-name {
+    font-size: 12px;
+  }
+
+  .member-role {
+    font-size: 10px;
+  }
+
+  .member-owns {
+    font-size: 10px;
+  }
+
+  .member-email {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,251 @@
+/**
+ * Account Expanded Styles
+ */
+
+.account-expanded {
+  padding: 24px;
+  background-color: white;
+  border-top: 1px solid #f0f0f0;
+}
+
+.expanded-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.expanded-section {
+  margin-bottom: 32px;
+}
+
+.expanded-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #0052cc;
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+/* Roster Table */
+.roster-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.roster-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  font-weight: 600;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.roster-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.roster-row:last-child {
+  border-bottom: none;
+}
+
+.roster-col-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.member-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.member-email {
+  font-size: 12px;
+  color: #999;
+}
+
+.roster-col-role {
+  font-size: 13px;
+  color: #666;
+}
+
+.roster-col-owns {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Focus Areas List */
+.focus-areas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.focus-area-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.focus-area-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.focus-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.focus-priority {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.focus-priority.priority-critical {
+  background-color: #ffeceb;
+  color: #ae2a19;
+}
+
+.focus-priority.priority-high {
+  background-color: #fff7d6;
+  color: #974f0c;
+}
+
+.focus-priority.priority-medium {
+  background-color: #dff5ff;
+  color: #0052cc;
+}
+
+.focus-description {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.focus-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: #999;
+}
+
+.focus-owner,
+.focus-due {
+  display: flex;
+  align-items: center;
+}
+
+.focus-status {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.focus-status.status-in-progress {
+  background-color: #dff5ff;
+  color: #0052cc;
+}
+
+.focus-status.status-completed {
+  background-color: #dffcf0;
+  color: #216e4e;
+}
+
+.focus-status.status-at-risk {
+  background-color: #ffeceb;
+  color: #ae2a19;
+}
+
+/* Empty Message */
+.empty-message {
+  color: #999;
+  font-size: 13px;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.go-to-hub-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #0052cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.go-to-hub-button:hover {
+  background-color: #0747a6;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .account-expanded {
+    padding: 16px;
+  }
+
+  .roster-header,
+  .roster-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .roster-col-owns {
+    display: none;
+  }
+
+  .section-title {
+    font-size: 12px;
+  }
+
+  .focus-area-item {
+    padding: 12px;
+  }
+
+  .focus-area-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .focus-priority {
+    align-self: flex-start;
+  }
+}

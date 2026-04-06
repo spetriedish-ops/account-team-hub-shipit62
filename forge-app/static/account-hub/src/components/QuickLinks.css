@@ -1,0 +1,63 @@
+/**
+ * Quick Links Styles
+ */
+
+.quick-links-section {
+  min-height: auto;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.quick-link:hover {
+  border-color: #0052cc;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 6px rgba(0, 82, 204, 0.1);
+  color: #0052cc;
+}
+
+.link-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.link-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .links-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .quick-link {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .link-icon {
+    font-size: 16px;
+  }
+
+  .link-label {
+    font-size: 11px;
+  }
+}

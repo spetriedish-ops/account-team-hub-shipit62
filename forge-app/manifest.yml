@@ -1,0 +1,76 @@
+app:
+  name: account-team-hub
+  title: Account Team Hub
+  description: Real-time collaboration surface for account teams powered by Confluence, Jira, Google Calendar, and Slack
+  key: account-team-hub
+  runtime:
+    name: nodejs20.x
+
+modules:
+  # Confluence macro modules - Custom UI dashboard components
+  - key: account-hub-macro
+    location: confluence:macro
+    title: Account Hub Dashboard
+    description: Main account team hub dashboard showing metrics, activities, and team info
+    resource: static/account-hub
+    properties:
+      accountId:
+        required: true
+        type: string
+        description: The account ID to display in this hub
+  
+  - key: gray-area-queue-macro
+    location: confluence:macro
+    title: Gray Area Queue
+    description: Displays unclaimed tasks requiring immediate attention
+    resource: static/account-hub
+    properties:
+      maxItems:
+        type: string
+        description: Maximum number of items to display
+
+  - key: focus-areas-macro
+    location: confluence:macro
+    title: Focus Areas
+    description: Inline-editable focus areas stored in page properties
+    resource: static/account-hub
+    properties:
+      focusAreaIds:
+        type: string
+        description: Comma-separated list of focus area IDs
+
+  # Jira global page module for cross-account dashboard
+  - key: portfolio-view
+    location: jira:globalPage
+    title: Account Portfolio View
+    description: Cross-account triage dashboard showing all account health and status
+    resource: static/portfolio-view
+
+  # Web triggers for external integrations
+  - key: google-calendar-sync
+    location: webtrigger
+    description: Receives Google Calendar push notifications and syncs to Confluence
+    endpoint: src/webtriggers/googleCalendarSync.js
+
+  - key: slack-pin-listener
+    location: webtrigger
+    description: Receives Slack pin events and stores them in Forge Storage
+    endpoint: src/webtriggers/slackPinListener.js
+
+  # GraphQL resolvers for data fetching
+  - key: resolvers
+    location: backend
+    resolver:
+      entry_point: src/resolvers/index.js
+
+permissions:
+  content:
+    - read
+    - write
+  storage: {}
+
+external:
+  fetch:
+    - googleapis.com
+    - slack.com
+    - api.loom.com

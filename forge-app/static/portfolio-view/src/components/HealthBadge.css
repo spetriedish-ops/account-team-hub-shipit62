@@ -1,0 +1,58 @@
+/**
+ * Health Badge Styles
+ */
+
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 70px;
+  text-align: center;
+}
+
+.health-emoji {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.health-score {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status-specific styles */
+.health-critical {
+  background-color: #ffeceb;
+  color: #ae2a19;
+}
+
+.health-at-risk {
+  background-color: #fff7d6;
+  color: #974f0c;
+}
+
+.health-healthy {
+  background-color: #fff3cd;
+  color: #b39200;
+}
+
+.health-excellent {
+  background-color: #dffcf0;
+  color: #216e4e;
+}
+
+@media (max-width: 768px) {
+  .health-badge {
+    min-width: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .health-emoji {
+    font-size: 12px;
+  }
+}

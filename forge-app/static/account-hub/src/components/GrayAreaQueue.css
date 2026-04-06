@@ -1,0 +1,110 @@
+/**
+ * Gray Area Queue Styles
+ */
+
+.gray-area-section {
+  min-height: 200px;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-item {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.task-item:hover {
+  border-color: #0052cc;
+  box-shadow: 0 2px 8px rgba(0, 82, 204, 0.1);
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.task-priority {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.task-priority.priority-high {
+  background-color: #ffeceb;
+  color: #ae2a19;
+}
+
+.task-priority.priority-medium {
+  background-color: #fff7d6;
+  color: #974f0c;
+}
+
+.task-priority.priority-low {
+  background-color: #dff5ff;
+  color: #0052cc;
+}
+
+.task-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+  flex: 1;
+}
+
+.task-meta {
+  font-size: 11px;
+  color: #999;
+  margin: 0 0 8px 0;
+}
+
+.claim-button {
+  background-color: #0052cc;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.claim-button:hover {
+  background-color: #0747a6;
+}
+
+.claim-button:active {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .task-item {
+    padding: 10px;
+  }
+
+  .task-header {
+    gap: 8px;
+  }
+
+  .task-title {
+    font-size: 12px;
+  }
+
+  .claim-button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

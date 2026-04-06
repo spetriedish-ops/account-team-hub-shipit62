@@ -1,0 +1,102 @@
+/**
+ * Recent Meetings Styles
+ */
+
+.meetings-section {
+  min-height: 250px;
+}
+
+.meetings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meetings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.meetings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meeting-item {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+  transition: all 0.2s ease;
+}
+
+.meeting-item:hover {
+  border-color: #0052cc;
+  box-shadow: 0 2px 6px rgba(0, 82, 204, 0.08);
+}
+
+.meeting-item.past {
+  opacity: 0.8;
+}
+
+.meeting-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #333;
+}
+
+.meeting-time {
+  font-size: 11px;
+  color: #999;
+  margin: 0 0 6px 0;
+}
+
+.meeting-link {
+  display: inline-block;
+  font-size: 11px;
+  color: #0052cc;
+  text-decoration: none;
+  margin-right: 8px;
+  transition: color 0.2s ease;
+}
+
+.meeting-link:hover {
+  color: #0747a6;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .meetings-section {
+    min-height: auto;
+  }
+
+  .meeting-item {
+    padding: 8px;
+  }
+
+  .meeting-title {
+    font-size: 11px;
+  }
+
+  .meeting-time {
+    font-size: 10px;
+  }
+
+  .meeting-link {
+    font-size: 10px;
+  }
+}
