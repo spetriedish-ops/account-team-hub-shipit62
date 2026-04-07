@@ -10,7 +10,8 @@
  * sorted by recency for the Account Hub dashboard.
  */
 
-import { storage, requestJira, requestConfluence } from '@forge/api';
+import { requestJira, requestConfluence } from '@forge/api';
+import { kvs } from '@forge/kvs';
 
 /**
  * Mock activity data for demonstration
@@ -102,13 +103,13 @@ export async function getActivityStream({ accountId, limit = 20 }) {
   try {
     // Check Forge Storage for cached activity
     const cacheKey = `account:${accountId}:activity:stream`;
-    let cachedActivity = await storage.get(cacheKey);
+    let cachedActivity = await kvs.get(cacheKey);
 
     if (!cachedActivity || Date.now() - (cachedActivity.cachedAt || 0) > 5 * 60 * 1000) {
       // Cache is older than 5 minutes or doesn't exist - fetch fresh data
       cachedActivity = await fetchActivityFromSources(accountId);
       cachedActivity.cachedAt = Date.now();
-      await storage.set(cacheKey, cachedActivity);
+      await kvs.set(cacheKey, cachedActivity);
     }
 
     // Sort by timestamp (newest first) and limit results
@@ -176,7 +177,7 @@ async function fetchActivityFromSources(accountId) {
 
     // Fetch Slack activity from Forge Storage (if available)
     const slackActivityKey = `account:${accountId}:slack:activity`;
-    const slackActivity = await storage.get(slackActivityKey);
+    const slackActivity = await kvs.get(slackActivityKey);
     if (slackActivity) {
       activities.push(...(slackActivity || []));
     }
@@ -200,7 +201,7 @@ async function fetchActivityFromSources(accountId) {
 export async function addActivityItem(accountId, activityItem) {
   try {
     const cacheKey = `account:${accountId}:activity:stream`;
-    const current = (await storage.get(cacheKey)) || { items: [] };
+    const current = (await kvs.get(cacheKey)) || { items: [] };
 
     // Add new item to the beginning
     current.items = [
@@ -218,7 +219,7 @@ export async function addActivityItem(accountId, activityItem) {
     }
 
     current.cachedAt = Date.now();
-    await storage.set(cacheKey, current);
+    await kvs.set(cacheKey, current);
   } catch (error) {
     console.error(`Error adding activity for account ${accountId}:`, error);
   }
@@ -235,7 +236,7 @@ export async function addActivityItem(accountId, activityItem) {
 export async function clearActivityCache(accountId) {
   try {
     const cacheKey = `account:${accountId}:activity:stream`;
-    await storage.delete(cacheKey);
+    await kvs.delete(cacheKey);
   } catch (error) {
     console.error(`Error clearing activity cache for account ${accountId}:`, error);
   }

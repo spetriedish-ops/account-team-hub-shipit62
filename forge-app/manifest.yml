@@ -1,22 +1,17 @@
 app:
-  name: account-team-hub
-  title: Account Team Hub
-  description: Real-time collaboration surface for account teams powered by
-    Confluence, Jira, Google Calendar, and Slack
-  key: account-team-hub
   runtime:
     name: nodejs20.x
   id: ari:cloud:ecosystem::app/568930e6-2da4-4789-9070-666ef510942f
 
 modules:
-  # Confluence macro modules - Custom UI dashboard components
-  confluence:macro:
+  # Confluence macro modules - Custom UI (React) dashboard components
+  macro:
     - key: account-hub-macro
       title: Account Hub Dashboard
-      description: Main account team hub dashboard showing metrics, activities, and
-        team info
+      description: Main account team hub dashboard showing metrics, activities, and team info
       resource: account-hub-resource
-      render: native
+      resolver:
+        function: resolver-fn
       properties:
         accountId:
           required: true
@@ -27,7 +22,8 @@ modules:
       title: Gray Area Queue
       description: Displays unclaimed tasks requiring immediate attention
       resource: account-hub-resource
-      render: native
+      resolver:
+        function: resolver-fn
       properties:
         maxItems:
           type: string
@@ -37,7 +33,8 @@ modules:
       title: Focus Areas
       description: Inline-editable focus areas stored in page properties
       resource: account-hub-resource
-      render: native
+      resolver:
+        function: resolver-fn
       properties:
         focusAreaIds:
           type: string
@@ -49,43 +46,45 @@ modules:
       title: Account Portfolio View
       description: Cross-account triage dashboard showing all account health and status
       resource: portfolio-view-resource
+      resolver:
+        function: resolver-fn
 
   # Web triggers for external integrations
   webtrigger:
     - key: google-calendar-sync
-      handler: googleCalendarSyncHandler
-      description: Receives Google Calendar push notifications and syncs to Confluence
+      function: gcal-sync-fn
 
     - key: slack-pin-listener
-      handler: slackPinListenerHandler
-      description: Receives Slack pin events and stores them in Forge Storage
+      function: slack-pin-fn
 
   # Backend function for resolvers and webtrigger handlers
   function:
-    - key: resolverHandler
-      handler: src/resolvers/index.handler
+    - key: resolver-fn
+      handler: resolvers/index.default
 
-    - key: googleCalendarSyncHandler
-      handler: src/webtriggers/googleCalendarSync.handler
+    - key: gcal-sync-fn
+      handler: webtriggers/googleCalendarSync.handler
 
-    - key: slackPinListenerHandler
-      handler: src/webtriggers/slackPinListener.handler
+    - key: slack-pin-fn
+      handler: webtriggers/slackPinListener.handler
 
 resources:
   - key: account-hub-resource
-    path: static/account-hub
+    path: static/account-hub/build
 
   - key: portfolio-view-resource
-    path: static/portfolio-view
+    path: static/portfolio-view/build
 
 permissions:
-  content:
-    - read
-    - write
-  storage: {}
-
-external:
-  fetch:
-    - googleapis.com
-    - slack.com
-    - api.loom.com
+  scopes:
+    - storage:app
+    - read:confluence-content.all
+    - write:confluence-content
+    - read:jira-work
+    - write:jira-work
+  external:
+    fetch:
+      backend:
+        - https://www.googleapis.com
+        - https://slack.com
+        - https://api.loom.com

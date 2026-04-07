@@ -10,7 +10,7 @@
  * in Confluence page properties for persistence.
  */
 
-import { storage } from '@forge/api';
+import { kvs } from '@forge/kvs';
 
 /**
  * Mock meetings data for demonstration
@@ -121,7 +121,7 @@ export async function getMeetings({ accountId, daysAhead = 30, daysBack = 7 }) {
   try {
     // Try to fetch from Forge Storage cache first
     const cacheKey = `account:${accountId}:meetings`;
-    let cachedMeetings = await storage.get(cacheKey);
+    let cachedMeetings = await kvs.get(cacheKey);
 
     if (!cachedMeetings || Date.now() - (cachedMeetings.cachedAt || 0) > 15 * 60 * 1000) {
       // Cache is older than 15 minutes - fetch fresh data
@@ -129,7 +129,7 @@ export async function getMeetings({ accountId, daysAhead = 30, daysBack = 7 }) {
         items: await fetchMeetingsFromCalendar(accountId, daysAhead, daysBack),
         cachedAt: Date.now(),
       };
-      await storage.set(cacheKey, cachedMeetings);
+      await kvs.set(cacheKey, cachedMeetings);
     }
 
     // Filter by date range
@@ -170,7 +170,7 @@ async function fetchMeetingsFromCalendar(accountId, daysAhead, daysBack) {
     // 3. Filter events by account team members or calendar
     //
     // Example:
-    // const token = await storage.get(`account:${accountId}:google-token`);
+    // const token = await kvs.get(`account:${accountId}:google-token`);
     // const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
     //   headers: {
     //     Authorization: `Bearer ${token}`,
@@ -211,13 +211,13 @@ async function fetchMeetingsFromCalendar(accountId, daysAhead, daysBack) {
 export async function getFocusAreas(accountId) {
   try {
     const key = `account:${accountId}:focus-areas`;
-    let focusAreas = await storage.get(key);
+    let focusAreas = await kvs.get(key);
 
     if (!focusAreas) {
       // Initialize with mock data or fetch from Confluence
       focusAreas = MOCK_FOCUS_AREAS[accountId] || [];
       if (focusAreas.length > 0) {
-        await storage.set(key, focusAreas);
+        await kvs.set(key, focusAreas);
       }
     }
 
@@ -262,16 +262,16 @@ export async function updateFocusAreas({ accountId, focusAreas }) {
 
     // Store in Forge Storage
     const key = `account:${accountId}:focus-areas`;
-    await storage.set(key, enrichedAreas);
+    await kvs.set(key, enrichedAreas);
 
     // Log the update
     const historyKey = `account:${accountId}:focus-areas:history`;
-    const history = (await storage.get(historyKey)) || [];
+    const history = (await kvs.get(historyKey)) || [];
     history.push({
       timestamp: new Date().toISOString(),
       areas: enrichedAreas,
     });
-    await storage.set(historyKey, history);
+    await kvs.set(historyKey, history);
 
     // In production, also update Confluence page properties:
     // await requestConfluence({
@@ -304,13 +304,13 @@ export async function updateFocusAreas({ accountId, focusAreas }) {
 export async function addMeetingRecording({ meetingId, recordingUrl, accountId }) {
   try {
     const key = `account:${accountId}:meetings`;
-    const cachedMeetings = await storage.get(key);
+    const cachedMeetings = await kvs.get(key);
 
     if (cachedMeetings && cachedMeetings.items) {
       const meeting = cachedMeetings.items.find((m) => m.id === meetingId);
       if (meeting) {
         meeting.recordingUrl = recordingUrl;
-        await storage.set(key, cachedMeetings);
+        await kvs.set(key, cachedMeetings);
         return meeting;
       }
     }
@@ -334,13 +334,13 @@ export async function addMeetingRecording({ meetingId, recordingUrl, accountId }
 export async function addMeetingNotes({ meetingId, notesUrl, accountId }) {
   try {
     const key = `account:${accountId}:meetings`;
-    const cachedMeetings = await storage.get(key);
+    const cachedMeetings = await kvs.get(key);
 
     if (cachedMeetings && cachedMeetings.items) {
       const meeting = cachedMeetings.items.find((m) => m.id === meetingId);
       if (meeting) {
         meeting.notesUrl = notesUrl;
-        await storage.set(key, cachedMeetings);
+        await kvs.set(key, cachedMeetings);
         return meeting;
       }
     }

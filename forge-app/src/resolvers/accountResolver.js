@@ -10,7 +10,8 @@
  * for demonstration purposes.
  */
 
-import { storage } from '@forge/api';
+import { kvs } from '@forge/kvs';
+import {} from '@forge/api';
 
 /**
  * Mock data for 3 sample accounts
@@ -79,7 +80,7 @@ export async function getAccounts() {
     // In production, you might query Jira for all issues with type=Account
     // or call an external service to get the account list
     const storageKey = 'accounts:list';
-    const storedAccounts = await storage.get(storageKey);
+    const storedAccounts = await kvs.get(storageKey);
 
     if (storedAccounts) {
       return storedAccounts;
@@ -88,9 +89,9 @@ export async function getAccounts() {
     // Fallback to mock data if not stored yet
     // Initialize mock accounts in storage for subsequent calls
     for (const account of MOCK_ACCOUNTS) {
-      await storage.set(`account:${account.id}`, account);
+      await kvs.set(`account:${account.id}`, account);
     }
-    await storage.set(storageKey, MOCK_ACCOUNTS);
+    await kvs.set(storageKey, MOCK_ACCOUNTS);
 
     return MOCK_ACCOUNTS;
   } catch (error) {
@@ -111,7 +112,7 @@ export async function getAccounts() {
 export async function getAccountHealth(accountId) {
   try {
     const key = `account:${accountId}:health`;
-    let healthData = await storage.get(key);
+    let healthData = await kvs.get(key);
 
     if (!healthData) {
       // Create initial health data from mock account
@@ -133,7 +134,7 @@ export async function getAccountHealth(accountId) {
         lastUpdated: new Date().toISOString(),
       };
 
-      await storage.set(key, healthData);
+      await kvs.set(key, healthData);
     }
 
     return healthData;
@@ -195,11 +196,11 @@ export async function updateAccountHealth({ accountId, healthScore, notes }) {
     }
 
     // Store the update
-    await storage.set(key, updatedHealth);
+    await kvs.set(key, updatedHealth);
 
     // Log the change for audit trail
     const auditKey = `account:${accountId}:health:history`;
-    const history = (await storage.get(auditKey)) || [];
+    const history = (await kvs.get(auditKey)) || [];
     history.push({
       timestamp: new Date().toISOString(),
       previousScore: currentHealth.score,
@@ -210,7 +211,7 @@ export async function updateAccountHealth({ accountId, healthScore, notes }) {
     if (history.length > 50) {
       history.shift();
     }
-    await storage.set(auditKey, history);
+    await kvs.set(auditKey, history);
 
     return updatedHealth;
   } catch (error) {
@@ -230,7 +231,7 @@ export async function updateAccountHealth({ accountId, healthScore, notes }) {
 export async function getTeamRoster(accountId) {
   try {
     const key = `account:${accountId}:roster`;
-    let roster = await storage.get(key);
+    let roster = await kvs.get(key);
 
     if (!roster) {
       // Use mock roster or fetch from Confluence/Jira
@@ -238,7 +239,7 @@ export async function getTeamRoster(accountId) {
 
       // Store in Forge Storage for future retrieval
       if (roster.length > 0) {
-        await storage.set(key, roster);
+        await kvs.set(key, roster);
       }
     }
 
@@ -261,16 +262,16 @@ export async function getTeamRoster(accountId) {
 export async function updateTeamRoster({ accountId, roster }) {
   try {
     const key = `account:${accountId}:roster`;
-    await storage.set(key, roster);
+    await kvs.set(key, roster);
 
     // Log the change
     const auditKey = `account:${accountId}:roster:history`;
-    const history = (await storage.get(auditKey)) || [];
+    const history = (await kvs.get(auditKey)) || [];
     history.push({
       timestamp: new Date().toISOString(),
       changes: roster,
     });
-    await storage.set(auditKey, history);
+    await kvs.set(auditKey, history);
 
     return roster;
   } catch (error) {

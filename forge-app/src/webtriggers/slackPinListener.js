@@ -25,7 +25,7 @@
  //   - users:read
  */
 
-import { storage } from '@forge/api';
+import { kvs } from '@forge/kvs';
 import { addActivityItem } from '../resolvers/activityResolver.js';
 
 /**
@@ -148,7 +148,7 @@ async function handlePinAdded(event, teamId) {
 
     // Store the pin
     const pinsKey = `account:${accountId}:slack:pins`;
-    const pins = (await storage.get(pinsKey)) || [];
+    const pins = (await kvs.get(pinsKey)) || [];
     pins.push(pin);
 
     // Keep only last 100 pins
@@ -156,7 +156,7 @@ async function handlePinAdded(event, teamId) {
       pins.shift();
     }
 
-    await storage.set(pinsKey, pins);
+    await kvs.set(pinsKey, pins);
 
     // Add to activity stream
     await addActivityItem(accountId, {
@@ -203,11 +203,11 @@ async function handleReactionAdded(event, teamId) {
 
     // Store the reaction
     const reactionKey = `account:${accountId}:slack:reactions:${timestamp}`;
-    const reactions = (await storage.get(reactionKey)) || [];
+    const reactions = (await kvs.get(reactionKey)) || [];
 
     if (!reactions.includes(userId)) {
       reactions.push(userId);
-      await storage.set(reactionKey, reactions);
+      await kvs.set(reactionKey, reactions);
 
       // Add to activity stream if this is the first hub-pin
       if (reactions.length === 1) {
@@ -262,7 +262,7 @@ async function mapChannelToAccount(channelId, teamId) {
   try {
     // Strategy 1: Check explicit mapping
     const mappingKey = `slack:channel:${channelId}:account`;
-    const mappedAccountId = await storage.get(mappingKey);
+    const mappedAccountId = await kvs.get(mappingKey);
 
     if (mappedAccountId) {
       return mappedAccountId;

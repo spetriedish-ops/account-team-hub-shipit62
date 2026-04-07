@@ -16,7 +16,7 @@
  * - Use Forge environment variables to store credentials
  */
 
-import { storage } from '@forge/api';
+import { kvs } from '@forge/kvs';
 import { addActivityItem } from '../resolvers/activityResolver.js';
 
 /**
@@ -77,11 +77,11 @@ export async function handler(request) {
 
     // Store meeting in account's meeting list
     const meetingKey = `account:${accountId}:meeting:${notification.id}`;
-    await storage.set(meetingKey, meeting);
+    await kvs.set(meetingKey, meeting);
 
     // Clear the meetings cache to force refresh
     const cacheKey = `account:${accountId}:meetings`;
-    await storage.delete(cacheKey);
+    await kvs.delete(cacheKey);
 
     // Add to activity stream
     await addActivityItem(accountId, {
@@ -124,7 +124,7 @@ export async function handler(request) {
  */
 function extractAccountIdFromNotification(notification) {
   // Option 1: Store a mapping in Forge Storage
-  // const mapping = await storage.get('calendar:accountId:mapping');
+  // const mapping = await kvs.get('calendar:accountId:mapping');
   // return mapping[notification.resourceId];
 
   // Option 2: Parse from resource URI
@@ -151,7 +151,7 @@ async function createMeetingNotesPage(accountId, meeting) {
     // 3. Store the page link back in the meeting object
     //
     // Example:
-    // const hubPageId = await storage.get(`account:${accountId}:hub-page-id`);
+    // const hubPageId = await kvs.get(`account:${accountId}:hub-page-id`);
     // const noteTemplate = `
     //   h2. ${meeting.title}
     //   
@@ -202,7 +202,7 @@ async function createMeetingNotesPage(accountId, meeting) {
  */
 async function fetchEventFromCalendarAPI(eventId) {
   // In production:
-  // const token = await storage.get('google:calendar:access-token');
+  // const token = await kvs.get('google:calendar:access-token');
   // const response = await fetch(
   //   `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
   //   {

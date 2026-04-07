@@ -13,7 +13,8 @@
  * - Need immediate triage
  */
 
-import { storage, requestJira } from '@forge/api';
+import { requestJira } from '@forge/api';
+import { kvs } from '@forge/kvs';
 
 /**
  * Mock Jira tasks for demonstration
@@ -247,18 +248,18 @@ export async function claimTask({ taskId, accountId }) {
 
     // Log the claim in Forge Storage
     const auditKey = `task:${taskId}:claims`;
-    const claims = (await storage.get(auditKey)) || [];
+    const claims = (await kvs.get(auditKey)) || [];
     claims.push({
       claimedBy: currentUserEmail,
       claimedAt: new Date().toISOString(),
       accountId,
     });
-    await storage.set(auditKey, claims);
+    await kvs.set(auditKey, claims);
 
     // Update claim count
     const claimCountKey = `account:${accountId}:stats:claimed`;
-    const claimCount = (await storage.get(claimCountKey)) || 0;
-    await storage.set(claimCountKey, claimCount + 1);
+    const claimCount = (await kvs.get(claimCountKey)) || 0;
+    await kvs.set(claimCountKey, claimCount + 1);
 
     // Return success response
     return {
@@ -321,12 +322,12 @@ export async function unclaimTask({ taskId, accountId }) {
 
     // Log the unclaim
     const auditKey = `task:${taskId}:unclaims`;
-    const unclaims = (await storage.get(auditKey)) || [];
+    const unclaims = (await kvs.get(auditKey)) || [];
     unclaims.push({
       unclaimedAt: new Date().toISOString(),
       accountId,
     });
-    await storage.set(auditKey, unclaims);
+    await kvs.set(auditKey, unclaims);
 
     return {
       taskId,
