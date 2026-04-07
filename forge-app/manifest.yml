@@ -1,17 +1,20 @@
 app:
   name: account-team-hub
   title: Account Team Hub
-  description: Real-time collaboration surface for account teams powered by Confluence, Jira, Google Calendar, and Slack
+  description: Real-time collaboration surface for account teams powered by
+    Confluence, Jira, Google Calendar, and Slack
   key: account-team-hub
   runtime:
     name: nodejs20.x
+  id: ari:cloud:ecosystem::app/568930e6-2da4-4789-9070-666ef510942f
 
 modules:
   # Confluence macro modules - Custom UI dashboard components
   confluence:macro:
     - key: account-hub-macro
       title: Account Hub Dashboard
-      description: Main account team hub dashboard showing metrics, activities, and team info
+      description: Main account team hub dashboard showing metrics, activities, and
+        team info
       resource: account-hub-resource
       render: native
       properties:
