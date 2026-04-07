@@ -12,7 +12,7 @@
  * - Meetings: Google Calendar sync and meeting notes
  */
 
-import { Resolver } from '@forge/resolver';
+import Resolver from '@forge/resolver';
 import * as accountResolver from './accountResolver.js';
 import * as activityResolver from './activityResolver.js';
 import * as tasksResolver from './tasksResolver.js';
