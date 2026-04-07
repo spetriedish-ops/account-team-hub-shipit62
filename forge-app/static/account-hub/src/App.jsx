@@ -31,6 +31,7 @@ import './App.css';
 function App() {
   // State management
   const [accountId, setAccountId] = useState(null);
+  const [pageTitle, setPageTitle] = useState(null);
   const [account, setAccount] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [activity, setActivity] = useState([]);
@@ -50,12 +51,25 @@ function App() {
     const getAccountInfo = async () => {
       try {
         const context = await getContext();
-        // The accountId is passed as a macro property
-        const id = context.accountId || context.extension?.parameters?.accountId || 'acc-001';
+        // The accountId is passed as a macro property in the Confluence editor
+        const id = context.extension?.parameters?.accountId
+          || context.accountId
+          || 'acc-001';
+
+        // The account name comes from the Confluence page title
+        // This makes each Hub page automatically named after the account
+        const pageTitle = context.extension?.content?.title
+          || context.extension?.page?.title
+          || null;
+
         setAccountId(id);
+
+        // Store page title in state so we can use it as account name fallback
+        if (pageTitle) {
+          setPageTitle(pageTitle);
+        }
       } catch (err) {
         console.error('Error getting account ID:', err);
-        // Default to first account for demo
         setAccountId('acc-001');
       }
     };
@@ -85,8 +99,13 @@ function App() {
         ]);
 
         // Find the current account from the list
-        const currentAccount = accounts.find((a) => a.id === accountId);
-        setAccount(currentAccount);
+        // If the page title is available, use it as the account name
+        // This makes the Hub dynamic — each page's title becomes the account name
+        const currentAccount = accounts.find((a) => a.id === accountId) || accounts[0];
+        setAccount({
+          ...currentAccount,
+          name: pageTitle || currentAccount?.name || accountId,
+        });
 
         // Calculate metrics
         const tasks = await invoke('getTasks', { accountId, limit: 50 });
