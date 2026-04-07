@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "deploy": "forge deploy",
-    "install": "forge install",
+    "forge-install": "forge install",
     "lint": "eslint src/",
     "test": "jest"
   },
@@ -20,8 +20,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@forge/api": "^2.8.0",
-    "@forge/resolver": "^2.8.0"
+    "@forge/api": "^7.1.2",
+    "@forge/resolver": "^1.7.1"
   },
   "devDependencies": {
     "eslint": "^8.50.0",
