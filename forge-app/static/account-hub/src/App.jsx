@@ -1,130 +1,132 @@
-/**
- * Account Hub App Component
- * 
- * Main Account Hub macro dashboard showing:
- * - Account header with name, ARR, tier, renewal date
- * - Key metrics (open tasks, unclaimed, meetings, support tickets)
- * - Recent activity stream
- * - Gray area queue (unclaimed tasks)
- * - Team roster
- * - Recent meetings with recordings
- * - Quick links section
- * - Inline-editable focus areas
- * 
- * This is a Confluence macro that displays within a page
- */
+import React, { useState, useEffect } from "react";
+import { invoke, getContext } from "@forge/bridge";
+import { motion } from "framer-motion";
 
-import React, { useState, useEffect } from 'react';
-import { invoke, getContext } from '@forge/bridge';
-import Header from './components/Header';
-import MetricsDashboard from './components/MetricsDashboard';
-import ActivityStream from './components/ActivityStream';
-import GrayAreaQueue from './components/GrayAreaQueue';
-import TeamRoster from './components/TeamRoster';
-import RecentMeetings from './components/RecentMeetings';
-import QuickLinks from './components/QuickLinks';
-import './App.css';
+// New Lovable-designed components
+import FocusAreasBanner from "./components/FocusAreasBanner";
+import StatsOverview from "./components/StatsOverview";
+import ActivityFeed from "./components/ActivityFeed";
+import GrayAreaQueue from "./components/GrayAreaQueue";
+import PinnedSlackMessages from "./components/PinnedSlackMessages";
+import AccountTeam from "./components/AccountTeam";
+import BottomLinks from "./components/BottomLinks";
+
+// Import Tailwind + global styles
+import "./index.css";
 
 /**
- * Main Account Hub component
+ * Account Hub — Main Forge macro app
+ *
+ * This component is the entry point for the Account Hub Confluence macro.
+ * It fetches account data from the backend resolvers via @forge/bridge,
+ * and renders the full hub UI using the Lovable-designed components.
+ *
+ * Data flow:
+ *   Confluence macro context → accountId, pageTitle
+ *   @forge/bridge invoke() → resolver functions → Jira/Confluence/Slack data
  */
+
 function App() {
-  // State management
-  const [accountId, setAccountId] = useState(null);
-  const [pageTitle, setPageTitle] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [metrics, setMetrics] = useState(null);
-  const [activity, setActivity] = useState([]);
-  const [grayArea, setGrayArea] = useState([]);
-  const [roster, setRoster] = useState([]);
-  const [meetings, setMeetings] = useState([]);
-  const [focusAreas, setFocusAreas] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [accountId, setAccountId] = useState(null);
+  const [accountName, setAccountName] = useState("Account Hub");
+  const [metrics, setMetrics] = useState({});
+  const [activities, setActivities] = useState([]);
+  const [grayAreaItems, setGrayAreaItems] = useState([]);
+  const [slackMessages, setSlackMessages] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [focusAreas, setFocusAreas] = useState([]);
 
-  /**
-   * Get account ID from macro properties on component mount
-   * Confluence macros pass properties through getContext()
-   */
+  // Step 1: Get context from Confluence macro (accountId + page title)
   useEffect(() => {
-    const getAccountInfo = async () => {
+    const init = async () => {
       try {
         const context = await getContext();
-        // The accountId is passed as a macro property in the Confluence editor
+
+        // accountId is passed as a macro property in the Confluence editor
         const id = context.extension?.parameters?.accountId
           || context.accountId
-          || 'acc-001';
+          || "acc-001";
 
-        // The account name comes from the Confluence page title
-        // This makes each Hub page automatically named after the account
+        // Use the Confluence page title as the account name
         const pageTitle = context.extension?.content?.title
           || context.extension?.page?.title
           || null;
 
         setAccountId(id);
-
-        // Store page title in state so we can use it as account name fallback
-        if (pageTitle) {
-          setPageTitle(pageTitle);
-        }
+        if (pageTitle) setAccountName(pageTitle);
       } catch (err) {
-        console.error('Error getting account ID:', err);
-        setAccountId('acc-001');
+        console.error("Error getting context:", err);
+        setAccountId("acc-001");
       }
     };
-
-    getAccountInfo();
+    init();
   }, []);
 
-  /**
-   * Fetch all account data when accountId is set
-   */
+  // Step 2: Once we have the accountId, fetch all data in parallel
   useEffect(() => {
     if (!accountId) return;
 
     const fetchData = async () => {
       try {
         setLoading(true);
-        setError(null);
 
-        // Fetch data in parallel for better performance
-        const [accounts, activity, grayArea, roster, meetings, focusAreas] = await Promise.all([
-          invoke('getAccounts'),
-          invoke('getActivityStream', { accountId, limit: 10 }),
-          invoke('getGrayAreaQueue', { accountId }),
-          invoke('getTeamRoster', { accountId }),
-          invoke('getMeetings', { accountId, daysAhead: 30, daysBack: 7 }),
-          invoke('getFocusAreas', { accountId }),
+        // Fetch all data in parallel for performance
+        const [tasks, activity, slackPins, roster, focus] = await Promise.allSettled([
+          invoke("getTasks", { accountId }),
+          invoke("getActivityStream", { accountId }),
+          invoke("getSlackPins", { accountId }),
+          invoke("getTeamRoster", { accountId }),
+          invoke("getFocusAreas", { accountId }),
         ]);
 
-        // Find the current account from the list
-        // If the page title is available, use it as the account name
-        // This makes the Hub dynamic — each page's title becomes the account name
-        const currentAccount = accounts.find((a) => a.id === accountId) || accounts[0];
-        setAccount({
-          ...currentAccount,
-          name: pageTitle || currentAccount?.name || accountId,
-        });
+        // Tasks → metrics + gray area queue
+        if (tasks.status === "fulfilled" && tasks.value) {
+          const taskData = tasks.value;
+          const allTasks = taskData.tasks || [];
+          const unclaimed = allTasks.filter((t) => !t.assignee || t.assignee === "Unassigned");
 
-        // Calculate metrics
-        const tasks = await invoke('getTasks', { accountId, limit: 50 });
-        setMetrics({
-          openTasks: tasks.filter((t) => t.status !== 'Done').length,
-          unclaimedTasks: grayArea.length,
-          meetings: meetings.length,
-          // Mock support ticket count — in production, query JSM API for open P1/P2 tickets
-          supportTickets: tasks.filter((t) => t.labels && t.labels.includes('support')).length || 2,
-        });
+          setMetrics({
+            openTasks: allTasks.filter((t) => t.status !== "Done").length,
+            unclaimedTasks: unclaimed.length,
+            supportTickets: taskData.supportTickets || 0,
+            meetings: taskData.upcomingMeetings || 0,
+          });
 
-        setActivity(activity);
-        setGrayArea(grayArea);
-        setRoster(roster);
-        setMeetings(meetings);
-        setFocusAreas(focusAreas);
+          setGrayAreaItems(
+            (taskData.grayAreaQueue || unclaimed.slice(0, 4)).map((t) => ({
+              id: t.id || t.key,
+              title: t.summary || t.title,
+              assignee: t.assignee || "Unassigned",
+              age: t.age || "—",
+              priority: t.priority?.toLowerCase() || "medium",
+            }))
+          );
+        }
+
+        // Activity stream
+        if (activity.status === "fulfilled" && activity.value) {
+          setActivities(activity.value.activities || []);
+        }
+
+        // Slack pins
+        if (slackPins.status === "fulfilled" && slackPins.value) {
+          setSlackMessages(slackPins.value.pins || []);
+        }
+
+        // Team roster
+        if (roster.status === "fulfilled" && roster.value) {
+          setTeamMembers(roster.value.members || []);
+        }
+
+        // Focus areas
+        if (focus.status === "fulfilled" && focus.value) {
+          setFocusAreas(focus.value.focusAreas || []);
+        }
       } catch (err) {
-        console.error('Error fetching account data:', err);
-        setError('Failed to load account hub. Please refresh the page.');
+        console.error("Error fetching account data:", err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -133,152 +135,112 @@ function App() {
     fetchData();
   }, [accountId]);
 
-  /**
-   * Handle claiming a task
-   */
-  const handleClaimTask = async (taskId) => {
+  const handleFocusAreasUpdate = async (updated) => {
     try {
-      await invoke('claimTask', { taskId, accountId });
-
-      // Refresh gray area queue
-      const updatedGrayArea = await invoke('getGrayAreaQueue', { accountId });
-      setGrayArea(updatedGrayArea);
+      await invoke("updateFocusAreas", { accountId, focusAreas: updated });
     } catch (err) {
-      console.error('Error claiming task:', err);
-      setError('Failed to claim task. Please try again.');
+      console.error("Failed to save focus areas:", err);
     }
   };
 
-  /**
-   * Handle updating focus areas
-   */
-  const handleUpdateFocusAreas = async (updatedAreas) => {
-    try {
-      const result = await invoke('updateFocusAreas', {
-        accountId,
-        focusAreas: updatedAreas,
-      });
-      setFocusAreas(result);
-    } catch (err) {
-      console.error('Error updating focus areas:', err);
-      setError('Failed to update focus areas. Please try again.');
-    }
+  const handleTaskClaimed = (taskId) => {
+    setGrayAreaItems((prev) =>
+      prev.map((item) => item.id === taskId ? { ...item, assignee: "You" } : item)
+    );
+    setMetrics((prev) => ({
+      ...prev,
+      unclaimedTasks: Math.max(0, (prev.unclaimedTasks || 1) - 1),
+    }));
   };
 
-  /**
-   * Handle updating health score
-   */
-  const handleUpdateHealth = async (newScore, notes) => {
-    try {
-      await invoke('updateAccountHealth', {
-        accountId,
-        healthScore: newScore,
-        notes,
-      });
-
-      // Refresh account data
-      const accounts = await invoke('getAccounts');
-      const updated = accounts.find((a) => a.id === accountId);
-      setAccount(updated);
-    } catch (err) {
-      console.error('Error updating health:', err);
-      setError('Failed to update health score. Please try again.');
-    }
-  };
-
-  // Loading state
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <span>Loading account hub...</span>
+      <div className="min-h-[400px] bg-[hsl(210,16%,97%)] flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-[hsl(215,16%,47%)]">Loading {accountName}...</p>
+        </div>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <div className="error-container">
-        <h3>Error</h3>
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  // No account found
-  if (!account) {
-    return (
-      <div className="error-container">
-        <h3>Account Not Found</h3>
-        <p>The account hub could not be loaded. Please check the macro properties.</p>
+      <div className="min-h-[200px] bg-[hsl(210,16%,97%)] flex items-center justify-center p-6">
+        <div className="atlassian-card p-6 max-w-md text-center space-y-3">
+          <p className="text-sm font-semibold text-[hsl(14,88%,45%)]">Failed to load account data</p>
+          <p className="text-xs text-[hsl(215,16%,47%)]">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-xs text-primary font-medium hover:underline"
+          >
+            Try again
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="account-hub">
-      {/* Header Section */}
-      <Header
-        account={account}
-        onHealthUpdate={handleUpdateHealth}
-      />
+    <div className="bg-[hsl(210,16%,97%)] min-h-screen">
+      {/* Account Hub Header */}
+      <header className="bg-primary px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded bg-white/20 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">
+              {accountName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div>
+            <h1 className="text-sm font-semibold text-white">{accountName}</h1>
+            <p className="text-xs text-white/70">Account Hub</p>
+          </div>
+        </div>
+      </header>
 
-      {/* Metrics Dashboard */}
-      {metrics && <MetricsDashboard metrics={metrics} />}
+      {/* Main content */}
+      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* Welcome */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h2 className="text-xl font-semibold text-[hsl(216,33%,17%)]">
+            Good morning, <span className="text-primary">Team</span> 👋
+          </h2>
+          <p className="text-sm text-[hsl(215,16%,47%)] mt-1">
+            Here's what's happening across {accountName} today.
+          </p>
+        </motion.div>
 
-      {/* Main Content Grid */}
-      <div className="hub-grid">
-        {/* Left Column */}
-        <div className="hub-column hub-column-left">
-          {/* Activity Stream */}
-          <ActivityStream activities={activity} />
+        {/* Focus Areas */}
+        <FocusAreasBanner
+          focusAreas={focusAreas.length ? focusAreas : undefined}
+          onUpdate={handleFocusAreasUpdate}
+        />
 
-          {/* Gray Area Queue */}
+        {/* Stats */}
+        <StatsOverview metrics={metrics} />
+
+        {/* Activity + Gray Area Queue side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ActivityFeed activities={activities.length ? activities : undefined} />
           <GrayAreaQueue
-            tasks={grayArea}
-            onClaimTask={handleClaimTask}
+            items={grayAreaItems.length ? grayAreaItems : undefined}
+            onClaim={handleTaskClaimed}
           />
         </div>
 
-        {/* Right Column */}
-        <div className="hub-column hub-column-right">
-          {/* Team Roster */}
-          <TeamRoster roster={roster} />
+        {/* Pinned Slack Messages */}
+        <PinnedSlackMessages messages={slackMessages.length ? slackMessages : undefined} />
 
-          {/* Recent Meetings */}
-          <RecentMeetings meetings={meetings} />
+        {/* Account Team */}
+        <AccountTeam members={teamMembers.length ? teamMembers : undefined} />
 
-          {/* Quick Links */}
-          <QuickLinks accountId={accountId} />
-        </div>
-      </div>
-
-      {/* Focus Areas Section (appears below grid) */}
-      <section className="focus-areas-section">
-        <h3 className="section-title">Focus Areas</h3>
-        <div className="focus-areas-editable">
-          {focusAreas.length > 0 ? (
-            <div className="focus-list">
-              {focusAreas.map((area) => (
-                <div key={area.id} className="focus-item">
-                  <div className="focus-item-header">
-                    <h4 className="focus-item-title">{area.title}</h4>
-                    <span className={`focus-item-priority priority-${area.priority}`}>
-                      {area.priority}
-                    </span>
-                  </div>
-                  {area.description && (
-                    <p className="focus-item-description">{area.description}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="empty-state">No focus areas set. Add some to track key priorities.</p>
-          )}
-        </div>
-      </section>
+        {/* Quick Links */}
+        <BottomLinks accountId={accountId} />
+      </main>
     </div>
   );
 }
