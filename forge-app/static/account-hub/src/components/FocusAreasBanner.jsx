@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * FocusAreasBanner — Editable focus areas at the top of the Hub
@@ -46,10 +45,7 @@ const FocusAreasBanner = ({ focusAreas: initial = defaultFocusAreas, onUpdate })
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <div
       className="atlassian-card p-4 border-l-4 border-l-primary"
     >
       <div className="flex items-center justify-between mb-3">
@@ -67,12 +63,10 @@ const FocusAreasBanner = ({ focusAreas: initial = defaultFocusAreas, onUpdate })
         </button>
       </div>
       <div className="space-y-2">
-        <AnimatePresence>
+        
           {areas.map((a, i) => (
-            <motion.div
+            <div
               key={a.id}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="flex items-start gap-2 group"
             >
@@ -106,9 +100,9 @@ const FocusAreasBanner = ({ focusAreas: initial = defaultFocusAreas, onUpdate })
                   </div>
                 </div>
               )}
-            </motion.div>
+            </div>
           ))}
-        </AnimatePresence>
+        
         {adding && (
           <div className="flex items-center gap-2 mt-2">
             <span className="text-primary text-sm">•</span>
@@ -125,7 +119,7 @@ const FocusAreasBanner = ({ focusAreas: initial = defaultFocusAreas, onUpdate })
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

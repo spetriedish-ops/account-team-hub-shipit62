@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 /**
  * PinnedSlackMessages — Messages pinned to the Hub via :hub-pin: emoji
@@ -13,10 +12,7 @@ const defaultMessages = [
 ];
 
 const PinnedSlackMessages = ({ messages = defaultMessages }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 15 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.35, duration: 0.3 }}
+  <div
     className="atlassian-card p-5"
   >
     <div className="flex items-center justify-between mb-4">
@@ -30,11 +26,8 @@ const PinnedSlackMessages = ({ messages = defaultMessages }) => (
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       {messages.map((msg, i) => (
-        <motion.div
+        <div
           key={i}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 + i * 0.05 }}
           className="p-3 rounded border border-[hsl(220,13%,89%)] hover:bg-[hsl(220,14%,93%)] transition-colors space-y-2"
         >
           <div className="flex items-center gap-1.5 text-xs text-[hsl(215,16%,47%)]">
@@ -46,10 +39,10 @@ const PinnedSlackMessages = ({ messages = defaultMessages }) => (
             <span className="font-medium text-[hsl(216,33%,17%)]">{msg.author}</span>
             <span>{msg.time}</span>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
-  </motion.div>
+  </div>
 );
 
 export default PinnedSlackMessages;

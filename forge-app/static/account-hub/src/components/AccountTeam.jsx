@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 
 /**
  * AccountTeam — Team roster for the account
@@ -38,10 +37,7 @@ const AccountTeam = ({ members: initialMembers = defaultMembers }) => {
   const removeMember = (id) => setMembers(members.filter((m) => m.id !== id));
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.3 }}
+    <div
       className="atlassian-card p-5"
     >
       <div className="flex items-center justify-between mb-4">
@@ -57,11 +53,8 @@ const AccountTeam = ({ members: initialMembers = defaultMembers }) => {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {members.map((m, i) => (
-          <motion.div
+          <div
             key={m.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 + i * 0.04 }}
             className="group relative p-4 rounded border border-[hsl(220,13%,89%)] text-center space-y-2 hover:bg-[hsl(220,14%,93%)] transition-colors"
           >
             <button
@@ -98,10 +91,10 @@ const AccountTeam = ({ members: initialMembers = defaultMembers }) => {
                 </button>
               </div>
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

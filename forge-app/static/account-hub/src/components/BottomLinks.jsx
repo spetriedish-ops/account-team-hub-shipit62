@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 /**
  * BottomLinks — Quick access links at the bottom of the Hub
@@ -44,21 +43,15 @@ const BottomLinks = ({ accountId, jiraBoardUrl = "#", confluenceSpaceUrl = "#", 
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.45, duration: 0.3 }}
+    <div
       className="grid grid-cols-1 md:grid-cols-3 gap-4"
     >
       {links.map((link, i) => (
-        <motion.a
+        <a
           key={link.label}
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 + i * 0.05 }}
           className="atlassian-card-interactive p-4 flex items-start gap-3 group cursor-pointer no-underline"
         >
           <div className="p-2 rounded bg-blue-50 text-primary group-hover:bg-blue-100 transition-colors">
@@ -73,9 +66,9 @@ const BottomLinks = ({ accountId, jiraBoardUrl = "#", confluenceSpaceUrl = "#", 
             </div>
             <p className="text-xs text-[hsl(215,16%,47%)] mt-0.5">{link.description}</p>
           </div>
-        </motion.a>
+        </a>
       ))}
-    </motion.div>
+    </div>
   );
 };
 

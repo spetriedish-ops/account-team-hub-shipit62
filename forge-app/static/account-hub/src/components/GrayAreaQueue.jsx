@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 // Note: @forge/bridge is NOT imported here — invoke is passed via the onClaim prop from App.jsx
 // This keeps the component testable outside of Forge context
 
@@ -30,10 +29,7 @@ const GrayAreaQueue = ({ items: initialItems = defaultItems, onClaim }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3, duration: 0.3 }}
+    <div
       className="atlassian-card p-5 flex-1"
     >
       <div className="flex items-center justify-between mb-4">
@@ -42,11 +38,8 @@ const GrayAreaQueue = ({ items: initialItems = defaultItems, onClaim }) => {
       </div>
       <div className="space-y-2">
         {items.map((item, i) => (
-          <motion.div
+          <div
             key={item.id}
-            initial={{ opacity: 0, x: 8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 + i * 0.05 }}
             className="p-3 rounded border border-[hsl(220,13%,89%)] hover:bg-[hsl(220,14%,93%)] transition-colors space-y-1.5"
           >
             <div className="flex items-start justify-between gap-2">
@@ -69,10 +62,10 @@ const GrayAreaQueue = ({ items: initialItems = defaultItems, onClaim }) => {
                 </button>
               )}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

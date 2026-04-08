@@ -11,7 +11,6 @@ try {
   invoke = async () => null;
   getContext = async () => ({});
 }
-import { motion } from "framer-motion";
 
 // New Lovable-designed components
 import FocusAreasBanner from "./components/FocusAreasBanner";
@@ -212,10 +211,7 @@ function App() {
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {/* Welcome */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+        <div
         >
           <h2 className="text-xl font-semibold text-[hsl(216,33%,17%)]">
             Good morning, <span className="text-primary">Team</span> 👋
@@ -223,7 +219,7 @@ function App() {
           <p className="text-sm text-[hsl(215,16%,47%)] mt-1">
             Here's what's happening across {accountName} today.
           </p>
-        </motion.div>
+        </div>
 
         {/* Focus Areas */}
         <FocusAreasBanner

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 // Icons as simple SVG components to avoid lucide-react dependency issues
 const ClipboardIcon = () => (
@@ -66,11 +65,8 @@ const StatsOverview = ({ metrics = {} }) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((s, i) => (
-        <motion.div
+        <div
           key={s.label}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 + i * 0.06, duration: 0.3 }}
           className="atlassian-card p-4 space-y-2"
         >
           <div className="flex items-center justify-between">
@@ -79,7 +75,7 @@ const StatsOverview = ({ metrics = {} }) => {
           </div>
           <p className="text-2xl font-semibold text-[hsl(216,33%,17%)]">{s.value}</p>
           <p className="text-xs text-[hsl(215,16%,47%)]">{s.change}</p>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

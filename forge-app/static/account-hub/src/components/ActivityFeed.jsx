@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 /**
  * ActivityFeed — Recent activity stream for the account
@@ -52,10 +51,7 @@ const defaultActivities = [
 ];
 
 const ActivityFeed = ({ activities = defaultActivities }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 15 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.25, duration: 0.3 }}
+  <div
     className="atlassian-card p-5"
   >
     <div className="flex items-center justify-between mb-4">
@@ -64,11 +60,8 @@ const ActivityFeed = ({ activities = defaultActivities }) => (
     </div>
     <div className="space-y-3">
       {activities.map((a, i) => (
-        <motion.div
+        <div
           key={i}
-          initial={{ opacity: 0, x: 8 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.35 + i * 0.05 }}
           className="flex items-start gap-3"
         >
           <div className={`mt-0.5 p-1.5 rounded ${typeColors[a.type] || typeColors.task}`}>
@@ -81,10 +74,10 @@ const ActivityFeed = ({ activities = defaultActivities }) => (
             </p>
             <p className="text-xs text-[hsl(215,16%,47%)] mt-0.5">{a.time}</p>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
-  </motion.div>
+  </div>
 );
 
 export default ActivityFeed;
