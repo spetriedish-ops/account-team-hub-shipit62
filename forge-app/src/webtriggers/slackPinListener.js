@@ -57,7 +57,7 @@ import { addActivityItem } from '../resolvers/activityResolver.js';
  */
 export async function handler(request) {
   try {
-    const payload = request.body;
+    const payload = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
 
     console.log('Slack event received:', payload.event?.type);
 
