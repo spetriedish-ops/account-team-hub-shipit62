@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { invoke } from "@forge/bridge";
+// Note: @forge/bridge is NOT imported here — invoke is passed via the onClaim prop from App.jsx
+// This keeps the component testable outside of Forge context
 
 const priorityBg = {
   high: "bg-red-100 text-red-700",
@@ -20,9 +21,9 @@ const GrayAreaQueue = ({ items: initialItems = defaultItems, onClaim }) => {
 
   const handleClaim = async (item) => {
     try {
-      await invoke("claimTask", { taskId: item.id });
+      // Call the onClaim callback from App.jsx which handles the @forge/bridge invoke
+      if (onClaim) await onClaim(item.id);
       setItems(items.map((i) => i.id === item.id ? { ...i, assignee: "You" } : i));
-      if (onClaim) onClaim(item.id);
     } catch (err) {
       console.error("Failed to claim task:", err);
     }

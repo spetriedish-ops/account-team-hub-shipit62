@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { invoke, getContext } from "@forge/bridge";
+// @forge/bridge is the Forge API bridge — only works inside Atlassian iframe context
+// Wrap in try/catch so the app renders with mock data even outside Forge
+let invoke, getContext;
+try {
+  const forgeBridge = require("@forge/bridge");
+  invoke = forgeBridge.invoke;
+  getContext = forgeBridge.getContext;
+} catch (e) {
+  console.warn("@forge/bridge not available — running in standalone mode with mock data");
+  invoke = async () => null;
+  getContext = async () => ({});
+}
 import { motion } from "framer-motion";
 
 // New Lovable-designed components
