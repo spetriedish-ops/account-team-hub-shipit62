@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 /**
  * FocusAreasBanner — Editable focus areas at the top of the Hub

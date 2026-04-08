@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 
 /**
  * PinnedSlackMessages — Messages pinned to the Hub via :hub-pin: emoji

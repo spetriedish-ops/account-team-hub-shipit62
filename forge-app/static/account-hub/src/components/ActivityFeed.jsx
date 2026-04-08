@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 
 /**
  * ActivityFeed — Recent activity stream for the account

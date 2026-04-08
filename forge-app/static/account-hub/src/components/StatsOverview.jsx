@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 
 // Icons as simple SVG components to avoid lucide-react dependency issues
 const ClipboardIcon = () => (

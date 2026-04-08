@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 // Note: @forge/bridge is NOT imported here — invoke is passed via the onClaim prop from App.jsx
 // This keeps the component testable outside of Forge context
 
